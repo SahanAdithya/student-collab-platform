@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import { ArrowRight, Compass, Users, Code, Zap } from "lucide-react";
 
@@ -35,29 +34,12 @@ export default async function Home() {
         </p>
 
         {/* Clerk Auth-Driven Dynamic Actions */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 mb-20">
+        <div className="flex flex-col sm:flex-row items-center gap-4 mb-20 justify-center">
           
-          <SignedOut>
-            <Link
-              href="/sign-in"
-              className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 px-8 py-4 text-base font-semibold text-white shadow-[0_4px_20px_rgba(99,102,241,0.3)] transition-all hover:scale-[1.02] hover:shadow-[0_4px_25px_rgba(99,102,241,0.45)] focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              Get Started
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Link>
-            
-            <Link
-              href="/sign-up"
-              className="inline-flex items-center gap-2 rounded-xl border border-gray-800 bg-gray-950/40 px-8 py-4 text-base font-semibold text-gray-300 transition-all hover:bg-gray-900/60 hover:text-white hover:border-gray-700 backdrop-blur-sm"
-            >
-              Sign Up
-            </Link>
-          </SignedOut>
-
-          <SignedIn>
+          {user ? (
             <div className="flex flex-col items-center gap-4">
               <span className="text-sm text-gray-400">
-                Welcome back, <span className="font-semibold text-indigo-300">{user?.firstName || user?.emailAddresses[0].emailAddress.split('@')[0]}</span>!
+                Welcome back, <span className="font-semibold text-indigo-300">{user.firstName || user.emailAddresses[0].emailAddress.split('@')[0]}</span>!
               </span>
               <Link
                 href="/dashboard"
@@ -67,7 +49,24 @@ export default async function Home() {
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
-          </SignedIn>
+          ) : (
+            <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
+              <Link
+                href="/sign-in"
+                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 px-8 py-4 text-base font-semibold text-white shadow-[0_4px_20px_rgba(99,102,241,0.3)] transition-all hover:scale-[1.02] hover:shadow-[0_4px_25px_rgba(99,102,241,0.45)] focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                Get Started
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+              
+              <Link
+                href="/sign-up"
+                className="inline-flex items-center gap-2 rounded-xl border border-gray-800 bg-gray-950/40 px-8 py-4 text-base font-semibold text-gray-300 transition-all hover:bg-gray-900/60 hover:text-white hover:border-gray-700 backdrop-blur-sm"
+              >
+                Sign Up
+              </Link>
+            </div>
+          )}
 
         </div>
 

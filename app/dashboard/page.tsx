@@ -43,7 +43,6 @@ export default function DashboardPage() {
                             userButtonAvatarBox: "h-9 w-9 border border-gray-800 hover:border-indigo-500/50 transition-colors shadow-sm"
                           }
                         }}
-                        afterSignOutUrl="/"
                     />
                 </div>
             </nav>
