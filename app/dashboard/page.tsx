@@ -22,7 +22,7 @@ export default function DashboardPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-[#07070a] text-gray-100 font-sans relative overflow-hidden">
-            
+
             {/* Ambient Background Glows */}
             <div className="absolute top-[-20%] left-[-10%] h-[600px] w-[600px] rounded-full bg-indigo-500/5 blur-[120px] pointer-events-none" />
             <div className="absolute bottom-[-20%] right-[-10%] h-[600px] w-[600px] rounded-full bg-purple-500/5 blur-[120px] pointer-events-none" />
@@ -35,13 +35,13 @@ export default function DashboardPage() {
                     </div>
                     CollabHub
                 </div>
-                
+
                 <div className="flex items-center gap-4">
-                    <UserButton 
+                    <UserButton
                         appearance={{
-                          elements: {
-                            userButtonAvatarBox: "h-9 w-9 border border-gray-800 hover:border-indigo-500/50 transition-colors shadow-sm"
-                          }
+                            elements: {
+                                userButtonAvatarBox: "h-9 w-9 border border-gray-800 hover:border-indigo-500/50 transition-colors shadow-sm"
+                            }
                         }}
                     />
                 </div>
@@ -49,7 +49,7 @@ export default function DashboardPage() {
 
             {/* Main Content Area */}
             <main className="relative z-10 mx-auto w-full max-w-7xl flex-1 p-6 md:p-8">
-                
+
                 {/* Hero Greeting Panel */}
                 <div className="mb-10 rounded-2xl border border-gray-900 bg-gradient-to-r from-gray-950/40 via-gray-950/20 to-transparent p-6 md:p-8 backdrop-blur-sm shadow-[0_4px_30px_rgba(0,0,0,0.2)]">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -87,9 +87,22 @@ export default function DashboardPage() {
                                 <p className="text-xs text-gray-500 max-w-xs mt-1">Ready to start? Discover active requests from fellow students or construct a new proposal.</p>
                             </div>
                         </div>
-                        <button className="w-full mt-6 rounded-xl bg-gradient-to-br from-indigo-600/80 to-purple-600/80 hover:from-indigo-600 hover:to-purple-600 py-3 text-sm font-semibold text-white transition-all hover:shadow-[0_4px_15px_rgba(99,102,241,0.25)]">
-                            Browse Project Catalog
-                        </button>
+
+                        {/* Action Buttons */}
+                        <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                            <Link
+                                href="/projects"
+                                className="flex-1 block text-center rounded-xl bg-gradient-to-br from-indigo-600/80 to-purple-600/80 hover:from-indigo-600 hover:to-purple-600 py-3 text-sm font-semibold text-white transition-all hover:shadow-[0_4px_15px_rgba(99,102,241,0.25)]"
+                            >
+                                Browse Project Catalog
+                            </Link>
+                            <Link
+                                href="/create-project"
+                                className="flex-1 block text-center rounded-xl border border-gray-700 bg-gray-900/50 hover:bg-gray-800 py-3 text-sm font-semibold text-gray-300 transition-all"
+                            >
+                                Post a New Project
+                            </Link>
+                        </div>
                     </div>
 
                     {/* Right Column: User Profile Panel */}
@@ -101,9 +114,9 @@ export default function DashboardPage() {
                             </div>
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3.5 border-b border-gray-900/50 pb-4">
-                                    <img 
-                                        src={user.imageUrl} 
-                                        alt="Profile" 
+                                    <img
+                                        src={user.imageUrl}
+                                        alt="Profile"
                                         className="h-12 w-12 rounded-full border border-gray-800"
                                     />
                                     <div>
@@ -131,11 +144,11 @@ export default function DashboardPage() {
                                 </div>
                             </div>
                         </div>
-                        <button 
+                        <button
                             onClick={() => {
-                              // Direct them to Clerk profile manager natively
-                              const btn = document.querySelector('button[aria-label="Open user button"]') as HTMLButtonElement;
-                              if (btn) btn.click();
+                                // Direct them to Clerk profile manager natively
+                                const btn = document.querySelector('button[aria-label="Open user button"]') as HTMLButtonElement;
+                                if (btn) btn.click();
                             }}
                             className="w-full mt-6 rounded-xl border border-gray-800 bg-gray-950/30 py-3 text-sm font-semibold text-gray-300 transition-all hover:bg-gray-900/50 hover:text-white hover:border-gray-700"
                         >
