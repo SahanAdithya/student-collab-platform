@@ -24,3 +24,19 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Hide Clerk "Secured by Clerk" & "Development Mode" branding elements */
+.cl-footer__hosting,
+.cl-footerAction__hosting,
+.cl-internal-cb7a7,
+.cl-internal-180g7w2,
+.cl-internal-1jby6b8,
+.cl-internal-1p84u3y,
+a[href*="clerk.com"],
+a[href*="clerk.dev"],
+a[href*="clerk.accounts"],
+div[class*="-hosting"],
+div[class*="cl-internal-"] > a[href*="clerk"],
+div[class*="cl-footerAction__hosting"] {
+  display: none !important;
+}
