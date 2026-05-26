@@ -2,14 +2,14 @@
 import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { CheckCircle, XCircle, ArrowLeft, FileText, User as UserIcon } from "lucide-react";
+import { CheckCircle, XCircle, ArrowLeft, FileText, User as UserIcon, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 
-// Initialize Supabase admin client
+// Initialize Supabase client for server-side operations (uses service role key if available to bypass RLS)
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
 export default async function ManageProjectPage({ params }: { params: Promise<{ id: string }> }) {
@@ -66,6 +66,24 @@ export default async function ManageProjectPage({ params }: { params: Promise<{ 
         revalidatePath(`/manage/${id}`);
     }
 
+    // 5. SERVER ACTION: Delete the project
+    async function deleteProject() {
+        "use server";
+
+        // Delete all associated applications first to maintain DB integrity
+        await supabase.from("applications").delete().eq("project_id", id);
+
+        // Delete the project
+        const { error } = await supabase.from("projects").delete().eq("id", id);
+
+        if (error) {
+            console.error("Error deleting project:", error);
+            return;
+        }
+
+        redirect("/dashboard");
+    }
+
     return (
         <div className="min-h-screen flex flex-col bg-[#07070a] text-gray-100 font-sans relative overflow-hidden">
 
@@ -80,16 +98,27 @@ export default async function ManageProjectPage({ params }: { params: Promise<{ 
                 </Link>
 
                 {/* Header */}
-                <div className="mb-10">
-                    <h1 className="text-3xl font-extrabold text-white mb-2">Manage Applications</h1>
-                    <p className="text-gray-400">Reviewing proposals for: <span className="font-semibold text-indigo-400">{project.title}</span></p>
+                <div className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b border-gray-900 pb-6">
+                    <div>
+                        <h1 className="text-3xl font-extrabold text-white mb-2">Manage Applications</h1>
+                        <p className="text-gray-400">Reviewing proposals for: <span className="font-semibold text-indigo-400">{project.title}</span></p>
 
-                    <div className="mt-4 inline-flex items-center rounded-full bg-gray-900/80 px-3 py-1 text-xs font-semibold border border-gray-800">
-                        Project Status:
-                        <span className={`ml-2 ${project.status === 'open' ? 'text-emerald-400' : 'text-indigo-400'}`}>
-                            {project.status.toUpperCase()}
-                        </span>
+                        <div className="mt-4 inline-flex items-center rounded-full bg-gray-900/80 px-3 py-1 text-xs font-semibold border border-gray-800">
+                            Project Status:
+                            <span className={`ml-2 ${project.status === 'open' ? 'text-emerald-400' : 'text-indigo-400'}`}>
+                                {project.status.toUpperCase()}
+                            </span>
+                        </div>
                     </div>
+
+                    <form action={deleteProject}>
+                        <button
+                            type="submit"
+                            className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-red-950/20 text-red-400 border border-red-500/20 hover:bg-red-900/20 hover:border-red-500/40 px-5 py-3 text-sm font-bold transition-all shadow-[0_0_20px_rgba(239,68,68,0.02)] cursor-pointer"
+                        >
+                            <Trash2 className="h-4 w-4" /> Delete Project
+                        </button>
+                    </form>
                 </div>
 
                 {/* Applications Feed */}
