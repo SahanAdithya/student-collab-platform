@@ -5,10 +5,10 @@ import { createClient } from "@supabase/supabase-js";
 import { Briefcase, ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 
-// Initialize Supabase admin client for server-side operations
+// Initialize Supabase client for server-side operations (uses service role key if available to bypass RLS)
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
 export default async function CreateProjectPage() {
