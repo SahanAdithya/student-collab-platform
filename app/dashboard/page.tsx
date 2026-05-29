@@ -2,7 +2,7 @@
 "use client";
 
 import { useUser, UserButton } from "@clerk/nextjs";
-import { LayoutDashboard, Briefcase, User as UserIcon, Calendar, Settings, ShieldCheck, Heart } from "lucide-react";
+import { LayoutDashboard, Briefcase, User as UserIcon, Calendar, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { createClient } from "../../utils/supabase/client";
@@ -13,83 +13,34 @@ const supabase = createClient();
 export default function DashboardPage() {
     const { isLoaded, isSignedIn, user } = useUser();
 
-    // Profile and Onboarding States
+    // Profile State
     const [profile, setProfile] = useState<any>(null);
     const [profileLoading, setProfileLoading] = useState(true);
-    const [needsOnboarding, setNeedsOnboarding] = useState(false);
-
-    // Form inputs
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [birthday, setBirthday] = useState("");
-    const [gender, setGender] = useState("");
-    const [formSubmitting, setFormSubmitting] = useState(false);
 
     // Fetch user's profile on mount
     useEffect(() => {
         if (!user) return;
 
         const fetchProfile = async () => {
-            const { data, error } = await supabase
-                .from("profiles")
-                .select("*")
-                .eq("id", user.id)
-                .single();
+            try {
+                const { data, error } = await supabase
+                    .from("profiles")
+                    .select("*")
+                    .eq("id", user.id)
+                    .single();
 
-            // Check if profile is missing any required details: first name, last name, birthday, or gender
-            if (error || !data || !data.first_name || !data.last_name || !data.birthday || !data.gender) {
-                setNeedsOnboarding(true);
-                // Pre-populate using Clerk data if available
-                setFirstName(user.firstName || "");
-                setLastName(user.lastName || "");
-                if (data) {
-                    setBirthday(data.birthday || "");
-                    setGender(data.gender || "");
+                if (!error && data) {
+                    setProfile(data);
                 }
-            } else {
-                setProfile(data);
+            } catch (err) {
+                console.error("Error fetching profile:", err);
+            } finally {
+                setProfileLoading(false);
             }
-            setProfileLoading(false);
         };
 
         fetchProfile();
     }, [user]);
-
-    // Handle form submission
-    const handleOnboardingSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!user) return;
-        setFormSubmitting(true);
-
-        const { error } = await supabase
-            .from("profiles")
-            .upsert({
-                id: user.id,
-                first_name: firstName,
-                last_name: lastName,
-                birthday,
-                gender,
-                role: 'student' // Default role
-            }, { onConflict: 'id' });
-
-        if (error) {
-            console.error("Error saving profile details:", error);
-            alert("Unable to save your profile details. Please verify your Supabase connection/RLS settings.");
-            setFormSubmitting(false);
-            return;
-        }
-
-        // Successfully updated locally
-        setProfile({
-            first_name: firstName,
-            last_name: lastName,
-            birthday,
-            gender,
-            role: 'student'
-        });
-        setNeedsOnboarding(false);
-        setFormSubmitting(false);
-    };
 
     if (!isLoaded || profileLoading) {
         return (
@@ -99,95 +50,8 @@ export default function DashboardPage() {
         );
     }
 
-    if (!isSignedIn) {
-        return null; // Handled by middleware/proxy redirection
-    }
-
-    // Render Onboarding Profile Setup Form
-    if (needsOnboarding) {
-        return (
-            <div className="min-h-screen flex flex-col bg-[#07070a] text-gray-100 font-sans relative overflow-hidden flex items-center justify-center p-4">
-                
-                {/* Ambient Background Glows */}
-                <div className="absolute top-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none" />
-                <div className="absolute bottom-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-purple-500/10 blur-[120px] pointer-events-none" />
-
-                {/* Glassmorphic Profile Setup Container */}
-                <div className="relative z-10 w-full max-w-lg bg-gray-950/20 p-8 rounded-2xl border border-gray-900 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
-                    <div className="text-center mb-8 border-b border-gray-900/60 pb-6">
-                        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-md">
-                            <UserIcon className="h-6 w-6" />
-                        </div>
-                        <h2 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Complete Your Profile</h2>
-                        <p className="text-xs text-gray-500 mt-1.5 font-medium">Please enter your setup credentials to unlock the collaborative hub.</p>
-                    </div>
-
-                    <form onSubmit={handleOnboardingSubmit} className="space-y-5">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">First Name</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={firstName}
-                                    onChange={(e) => setFirstName(e.target.value)}
-                                    className="w-full rounded-xl border border-gray-900 bg-gray-900/10 px-4 py-3 text-sm text-gray-100 placeholder-gray-600 focus:border-indigo-500/50 focus:ring-0 focus:outline-none focus:bg-gray-900/20 transition-all"
-                                    placeholder="e.g., Sahan"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Last Name</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={lastName}
-                                    onChange={(e) => setLastName(e.target.value)}
-                                    className="w-full rounded-xl border border-gray-900 bg-gray-900/10 px-4 py-3 text-sm text-gray-100 placeholder-gray-600 focus:border-indigo-500/50 focus:ring-0 focus:outline-none focus:bg-gray-900/20 transition-all"
-                                    placeholder="e.g., Adithya"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Birthday</label>
-                            <input
-                                type="date"
-                                required
-                                value={birthday}
-                                onChange={(e) => setBirthday(e.target.value)}
-                                className="w-full rounded-xl border border-gray-900 bg-gray-900/10 px-4 py-3 text-sm text-gray-100 focus:border-indigo-500/50 focus:ring-0 focus:outline-none focus:bg-gray-900/20 transition-all"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Gender</label>
-                            <div className="relative">
-                                <select
-                                    required
-                                    value={gender}
-                                    onChange={(e) => setGender(e.target.value)}
-                                    className="w-full rounded-xl border border-gray-900 bg-gray-950 px-4 py-3 text-sm text-gray-100 focus:border-indigo-500/50 focus:ring-0 focus:outline-none focus:bg-gray-900/20 transition-all cursor-pointer"
-                                >
-                                    <option value="" disabled className="bg-gray-950 text-gray-500">Select your gender</option>
-                                    <option value="male" className="bg-gray-950 text-gray-100">Male</option>
-                                    <option value="female" className="bg-gray-950 text-gray-100">Female</option>
-                                    <option value="non-binary" className="bg-gray-950 text-gray-100">Non-Binary</option>
-                                    <option value="other" className="bg-gray-950 text-gray-100">Prefer not to say</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={formSubmitting}
-                            className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 py-4 text-sm font-bold text-white transition-all hover:shadow-[0_4px_15px_rgba(99,102,241,0.3)] disabled:opacity-50 cursor-pointer mt-4"
-                        >
-                            {formSubmitting ? "Configuring Profile..." : "Complete Setup"}
-                        </button>
-                    </form>
-                </div>
-            </div>
-        );
+    if (!isSignedIn || !user) {
+        return null; // Guarded by OnboardingGuard & clerkMiddleware
     }
 
     // Render Full Dashboard once profile exists
