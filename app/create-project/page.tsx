@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import { Briefcase, ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
+import PdfDropzone from "./PdfDropzone";
 
 // Initialize Supabase client for server-side operations (uses service role key if available to bypass RLS)
 const supabase = createClient(
@@ -25,6 +26,31 @@ export default async function CreateProjectPage() {
         const budget = formData.get("budget") as string;
         const contact_email = formData.get("contact_email") as string;
 
+        let specification_url = "";
+        const file = formData.get("specification") as File;
+        if (file && file.size > 0) {
+            try {
+                const fileBuffer = Buffer.from(await file.arrayBuffer());
+                const fileName = `${userId}-${Date.now()}-${file.name.replace(/\s+/g, "_")}`;
+                const { data: uploadData, error: uploadErr } = await supabase.storage
+                    .from("specifications")
+                    .upload(fileName, fileBuffer, {
+                        contentType: file.type,
+                    });
+
+                if (!uploadErr) {
+                    const { data: publicUrlData } = supabase.storage
+                        .from("specifications")
+                        .getPublicUrl(fileName);
+                    specification_url = publicUrlData.publicUrl;
+                } else {
+                    console.error("Supabase Storage upload error:", uploadErr);
+                }
+            } catch (err) {
+                console.error("Buffer parsing / upload error:", err);
+            }
+        }
+
         // First, ensure the user exists in our Supabase profiles table
         // (In a production app, we'd do this via a Clerk Webhook, but this works for our MVP!)
         await supabase.from("profiles").upsert({
@@ -39,6 +65,7 @@ export default async function CreateProjectPage() {
             description,
             budget,
             contact_email,
+            specification_url,
         });
 
         if (error) {
@@ -118,6 +145,8 @@ export default async function CreateProjectPage() {
                             placeholder="e.g., yourname@university.edu"
                         />
                     </div>
+
+                    <PdfDropzone />
 
                     <div>
                         <label htmlFor="description" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Project Description & Requirements</label>
