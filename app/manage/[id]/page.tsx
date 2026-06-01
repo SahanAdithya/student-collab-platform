@@ -2,7 +2,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { CheckCircle, XCircle, ArrowLeft, FileText, User as UserIcon, Trash2, Mail } from "lucide-react";
+import { CheckCircle, XCircle, ArrowLeft, FileText, User as UserIcon, Trash2, Mail, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { sendEmail } from "../../../utils/mail";
@@ -173,14 +173,24 @@ The CollabHub Team`;
                         </div>
                     </div>
 
-                    <form action={deleteProject}>
-                        <button
-                            type="submit"
-                            className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-red-950/20 text-red-400 border border-red-500/20 hover:bg-red-900/20 hover:border-red-500/40 px-5 py-3 text-sm font-bold transition-all shadow-[0_0_20px_rgba(239,68,68,0.02)] cursor-pointer"
-                        >
-                            <Trash2 className="h-4 w-4" /> Delete Project
-                        </button>
-                    </form>
+                    <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                        {project.status === "in-progress" && (
+                            <Link
+                                href={`/projects/${project.id}/chat`}
+                                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-5 py-3 text-sm font-bold transition-all hover:shadow-[0_4px_15px_rgba(99,102,241,0.25)]"
+                            >
+                                <MessageSquare className="h-4.5 w-4.5" /> Open Workspace Chat
+                            </Link>
+                        )}
+                        <form action={deleteProject} className="w-full sm:w-auto">
+                            <button
+                                type="submit"
+                                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-red-950/20 text-red-400 border border-red-500/20 hover:bg-red-900/20 hover:border-red-500/40 px-5 py-3 text-sm font-bold transition-all shadow-[0_0_20px_rgba(239,68,68,0.02)] cursor-pointer"
+                            >
+                                <Trash2 className="h-4 w-4" /> Delete Project
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
                 {/* Applications Feed */}
