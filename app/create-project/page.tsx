@@ -23,6 +23,7 @@ export default async function CreateProjectPage() {
         const title = formData.get("title") as string;
         const description = formData.get("description") as string;
         const budget = formData.get("budget") as string;
+        const contact_email = formData.get("contact_email") as string;
 
         // First, ensure the user exists in our Supabase profiles table
         // (In a production app, we'd do this via a Clerk Webhook, but this works for our MVP!)
@@ -37,6 +38,7 @@ export default async function CreateProjectPage() {
             title,
             description,
             budget,
+            contact_email,
         });
 
         if (error) {
@@ -102,6 +104,18 @@ export default async function CreateProjectPage() {
                             id="budget"
                             className="w-full rounded-xl border border-gray-900 bg-gray-900/10 px-4 py-3 text-sm text-gray-100 placeholder-gray-600 focus:border-indigo-500/50 focus:ring-0 focus:outline-none focus:bg-gray-900/20 transition-all"
                             placeholder="e.g., stipend of $250, course credit, or Unpaid"
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="contact_email" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Contact Email</label>
+                        <input
+                            type="email"
+                            name="contact_email"
+                            id="contact_email"
+                            required
+                            className="w-full rounded-xl border border-gray-900 bg-gray-900/10 px-4 py-3 text-sm text-gray-100 placeholder-gray-600 focus:border-indigo-500/50 focus:ring-0 focus:outline-none focus:bg-gray-900/20 transition-all"
+                            placeholder="e.g., yourname@university.edu"
                         />
                     </div>
 

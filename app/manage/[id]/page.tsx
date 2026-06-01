@@ -2,7 +2,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { CheckCircle, XCircle, ArrowLeft, FileText, User as UserIcon, Trash2 } from "lucide-react";
+import { CheckCircle, XCircle, ArrowLeft, FileText, User as UserIcon, Trash2, Mail } from "lucide-react";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 
@@ -135,7 +135,18 @@ export default async function ManageProjectPage({ params }: { params: Promise<{ 
                                                 <UserIcon className="h-5 w-5" />
                                             </div>
                                             <div>
-                                                <div className="text-sm font-bold text-gray-200">Applicant ID: {app.applicant_id.slice(-6)}</div>
+                                                <div className="text-sm font-bold text-gray-200 flex flex-wrap items-center gap-2">
+                                                    Applicant ID: {app.applicant_id.slice(-6)}
+                                                    {app.contact_email && (
+                                                        <a
+                                                            href={`mailto:${app.contact_email}`}
+                                                            className="inline-flex items-center gap-1 text-[10px] font-semibold text-indigo-400 bg-indigo-500/5 hover:bg-indigo-500/10 hover:text-indigo-300 border border-indigo-500/10 hover:border-indigo-500/30 rounded-md px-2 py-0.5 transition-all"
+                                                        >
+                                                            <Mail className="h-3 w-3" />
+                                                            {app.contact_email}
+                                                        </a>
+                                                    )}
+                                                </div>
                                                 <div className="text-xs text-gray-500">Applied {new Date(app.created_at).toLocaleDateString()}</div>
                                             </div>
                                         </div>

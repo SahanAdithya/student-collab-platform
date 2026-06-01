@@ -2,7 +2,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { Briefcase, Clock, DollarSign, ArrowLeft, Send } from "lucide-react";
+import { Briefcase, Clock, DollarSign, ArrowLeft, Send, Mail } from "lucide-react";
 import Link from "next/link";
 
 // Initialize Supabase client for server-side operations (uses service role key if available to bypass RLS)
@@ -43,6 +43,7 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
         "use server";
 
         const message = formData.get("message") as string;
+        const contact_email = formData.get("contact_email") as string;
 
         // Ensure the user exists in profiles (acting as a student here)
         await supabase.from("profiles").upsert({
@@ -55,6 +56,7 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
             project_id: id,
             applicant_id: userId,
             message,
+            contact_email,
         });
 
         if (error) {
@@ -101,9 +103,21 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
 
                     <h1 className="text-3xl font-extrabold text-white mb-6 leading-tight">{project.title}</h1>
 
-                    <div className="inline-flex items-center gap-2 text-emerald-400 font-semibold bg-emerald-500/5 border border-emerald-500/10 rounded-xl px-4 py-2.5 backdrop-blur-sm text-sm">
-                        <DollarSign className="h-4.5 w-4.5" />
-                        {project.budget || "Unpaid / Portfolio Work"}
+                    <div className="flex flex-wrap gap-3">
+                        <div className="inline-flex items-center gap-2 text-emerald-400 font-semibold bg-emerald-500/5 border border-emerald-500/10 rounded-xl px-4 py-2.5 backdrop-blur-sm text-sm">
+                            <DollarSign className="h-4.5 w-4.5" />
+                            {project.budget || "Unpaid / Portfolio Work"}
+                        </div>
+
+                        {project.contact_email && (
+                            <a
+                                href={`mailto:${project.contact_email}`}
+                                className="inline-flex items-center gap-2 text-indigo-400 hover:text-indigo-300 font-semibold bg-indigo-500/5 border border-indigo-500/10 hover:border-indigo-500/30 rounded-xl px-4 py-2.5 backdrop-blur-sm text-sm transition-all"
+                            >
+                                <Mail className="h-4.5 w-4.5" />
+                                {project.contact_email}
+                            </a>
+                        )}
                     </div>
                 </div>
 
@@ -124,13 +138,30 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
                     <p className="text-xs text-gray-400 mb-6">Introduce yourself, detail your skill set, and explain why you are the right fit for this project.</p>
 
                     <form action={submitApplication} className="space-y-5">
-                        <textarea
-                            name="message"
-                            required
-                            rows={5}
-                            placeholder="Hi Sahan! I have active experience building e-commerce frontends with React and custom CSS layouts, and would love to collaborate..."
-                            className="w-full rounded-xl border border-gray-900 bg-gray-900/10 p-4 text-sm text-gray-100 placeholder-gray-600 focus:border-indigo-500/50 focus:ring-0 focus:outline-none focus:bg-gray-900/20 transition-all resize-none"
-                        />
+                        <div>
+                            <label htmlFor="contact_email" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Your Contact Email</label>
+                            <input
+                                type="email"
+                                name="contact_email"
+                                id="contact_email"
+                                required
+                                className="w-full rounded-xl border border-gray-900 bg-gray-900/10 p-4 text-sm text-gray-100 placeholder-gray-600 focus:border-indigo-500/50 focus:ring-0 focus:outline-none transition-all"
+                                placeholder="e.g., yourname@university.edu"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="message" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Proposal Message</label>
+                            <textarea
+                                name="message"
+                                id="message"
+                                required
+                                rows={5}
+                                placeholder="Hi Sahan! I have active experience building e-commerce frontends with React and custom CSS layouts, and would love to collaborate..."
+                                className="w-full rounded-xl border border-gray-900 bg-gray-900/10 p-4 text-sm text-gray-100 placeholder-gray-600 focus:border-indigo-500/50 focus:ring-0 focus:outline-none focus:bg-gray-900/20 transition-all resize-none"
+                            />
+                        </div>
+
                         <button
                             type="submit"
                             className="group flex w-full md:w-auto items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 px-8 py-3.5 text-sm font-bold text-white transition-all hover:shadow-[0_4px_15px_rgba(99,102,241,0.3)] cursor-pointer"
