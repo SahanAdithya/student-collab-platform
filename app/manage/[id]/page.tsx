@@ -147,7 +147,7 @@ The CollabHub Team`;
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-[#07070a] text-gray-100 font-sans relative overflow-hidden">
+        <div className="min-h-screen flex flex-col bg-transparent text-gray-100 font-sans relative overflow-hidden">
 
             {/* Ambient Glow */}
             <div className="absolute top-[-10%] right-[-5%] h-[500px] w-[500px] rounded-full bg-indigo-500/10 blur-[150px] pointer-events-none" />
@@ -187,7 +187,7 @@ The CollabHub Team`;
                 <div className="space-y-6">
                     {applications && applications.length > 0 ? (
                         applications.map((app) => (
-                            <div key={app.id} className="rounded-2xl border border-gray-900 bg-gray-950/40 p-6 backdrop-blur-sm transition-all hover:border-gray-800">
+                            <div key={app.id} className="glass-card rounded-2xl p-6">
                                 <div className="flex flex-col md:flex-row gap-6 justify-between">
 
                                     {/* Applicant Info & Message */}

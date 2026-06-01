@@ -6,7 +6,7 @@ export default async function Home() {
   const user = await currentUser();
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#07070a] text-gray-100 font-sans p-6">
+    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-transparent text-gray-100 font-sans p-6">
       
       {/* Dynamic Ambient Background Glows */}
       <div className="absolute top-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none" />
@@ -73,7 +73,7 @@ export default async function Home() {
         {/* Feature Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-left">
           
-          <div className="rounded-2xl border border-gray-900 bg-gray-950/20 p-6 backdrop-blur-sm hover:border-gray-800/80 hover:bg-gray-900/10 transition-all">
+          <div className="glass-card rounded-2xl p-6">
             <div className="mb-4 inline-flex rounded-lg bg-indigo-500/10 p-2.5 text-indigo-400 border border-indigo-500/10">
               <Compass className="h-5 w-5" />
             </div>
@@ -83,7 +83,7 @@ export default async function Home() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-gray-900 bg-gray-950/20 p-6 backdrop-blur-sm hover:border-gray-800/80 hover:bg-gray-900/10 transition-all">
+          <div className="glass-card rounded-2xl p-6">
             <div className="mb-4 inline-flex rounded-lg bg-purple-500/10 p-2.5 text-purple-400 border border-purple-500/10">
               <Users className="h-5 w-5" />
             </div>
@@ -93,7 +93,7 @@ export default async function Home() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-gray-900 bg-gray-950/20 p-6 backdrop-blur-sm hover:border-gray-800/80 hover:bg-gray-900/10 transition-all">
+          <div className="glass-card rounded-2xl p-6">
             <div className="mb-4 inline-flex rounded-lg bg-pink-500/10 p-2.5 text-pink-400 border border-pink-500/10">
               <Code className="h-5 w-5" />
             </div>

@@ -114,7 +114,7 @@ export default function OnboardingPage() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-[#07070a] text-gray-100 font-sans relative overflow-hidden items-center justify-center p-4">
+        <div className="min-h-screen flex flex-col bg-transparent text-gray-100 font-sans relative overflow-hidden items-center justify-center p-4">
             
             {/* Ambient Background Glows */}
             <div className="absolute top-[-15%] left-[-10%] h-[600px] w-[600px] rounded-full bg-indigo-500/10 blur-[130px] pointer-events-none" />
@@ -124,7 +124,7 @@ export default function OnboardingPage() {
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f29370a_1px,transparent_1px),linear-gradient(to_bottom,#1f29370a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none opacity-30" />
 
             {/* Glassmorphic Profile Setup Container */}
-            <div className="relative z-10 w-full max-w-xl bg-gray-950/20 p-8 md:p-10 rounded-3xl border border-gray-900 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.4)]">
+            <div className="relative z-10 w-full max-w-xl glass-card p-8 md:p-10 rounded-3xl">
                 
                 {/* Header */}
                 <div className="text-center mb-8 border-b border-gray-900 pb-6">

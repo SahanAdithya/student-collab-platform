@@ -51,7 +51,7 @@ export default async function CreateProjectPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#07070a] text-gray-100 font-sans py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden flex items-center justify-center">
+        <div className="min-h-screen bg-transparent text-gray-100 font-sans py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden flex items-center justify-center">
             
             {/* Ambient Background Glows */}
             <div className="absolute top-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-indigo-500/5 blur-[120px] pointer-events-none" />
@@ -69,7 +69,7 @@ export default async function CreateProjectPage() {
                 Back to Dashboard
             </Link>
 
-            <div className="relative z-10 w-full max-w-2xl bg-gray-950/20 p-8 rounded-2xl border border-gray-900 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
+            <div className="relative z-10 w-full max-w-2xl glass-card p-8 rounded-2xl">
                 
                 {/* Header */}
                 <div className="flex items-center gap-3.5 mb-6 border-b border-gray-900 pb-6">

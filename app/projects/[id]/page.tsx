@@ -130,7 +130,7 @@ The CollabHub Team`;
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-[#07070a] text-gray-100 font-sans relative overflow-hidden">
+        <div className="min-h-screen flex flex-col bg-transparent text-gray-100 font-sans relative overflow-hidden">
 
             {/* Ambient Background Glows */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-indigo-500/5 blur-[150px] pointer-events-none" />
@@ -151,7 +151,7 @@ The CollabHub Team`;
                 </Link>
 
                 {/* Project Header Card */}
-                <div className="rounded-2xl border border-gray-900 bg-gray-950/20 p-8 backdrop-blur-md mb-8 shadow-[0_4px_30px_rgba(0,0,0,0.2)]">
+                <div className="glass-card rounded-2xl p-8 mb-8">
                     <div className="mb-4 flex items-center gap-3">
                         <span className="inline-flex items-center rounded-full bg-indigo-500/10 px-2.5 py-0.5 text-xs font-medium text-indigo-400 border border-indigo-500/20">
                             Open Request
@@ -183,7 +183,7 @@ The CollabHub Team`;
                 </div>
 
                 {/* Project Description Scope */}
-                <div className="rounded-2xl border border-gray-900 bg-gray-950/20 p-8 backdrop-blur-sm mb-8">
+                <div className="glass-card rounded-2xl p-8 mb-8">
                     <h2 className="text-lg font-bold text-gray-200 mb-4 flex items-center gap-2 border-b border-gray-900 pb-3">
                         <Briefcase className="h-5 w-5 text-purple-400" />
                         Project Scope
@@ -194,7 +194,7 @@ The CollabHub Team`;
                 </div>
 
                 {/* Application Submission Form */}
-                <div className="rounded-2xl border border-indigo-500/20 bg-gradient-to-b from-indigo-950/5 to-gray-950/40 p-8 backdrop-blur-md shadow-[0_4px_30px_rgba(99,102,241,0.02)]">
+                <div className="glass-card rounded-2xl p-8">
                     <h2 className="text-xl font-bold text-white mb-2">Submit a Proposal</h2>
                     <p className="text-xs text-gray-400 mb-6">Introduce yourself, detail your skill set, and explain why you are the right fit for this project.</p>
 

@@ -17,29 +17,66 @@ export default function DashboardPage() {
     const [profile, setProfile] = useState<any>(null);
     const [profileLoading, setProfileLoading] = useState(true);
 
-    // Fetch user's profile on mount
+    // Collaborations State
+    const [myProjects, setMyProjects] = useState<any[]>([]);
+    const [myApplications, setMyApplications] = useState<any[]>([]);
+    const [collabsLoading, setCollabsLoading] = useState(true);
+
+    // Fetch user's profile and active collaborations on mount
     useEffect(() => {
         if (!user) return;
 
-        const fetchProfile = async () => {
+        const fetchData = async () => {
             try {
-                const { data, error } = await supabase
+                // 1. Fetch profile
+                const { data: profileData, error: profileError } = await supabase
                     .from("profiles")
                     .select("*")
                     .eq("id", user.id)
                     .single();
 
-                if (!error && data) {
-                    setProfile(data);
+                if (!profileError && profileData) {
+                    setProfile(profileData);
                 }
+
+                // 2. Fetch projects posted by the user
+                const { data: projectsData, error: projectsError } = await supabase
+                    .from("projects")
+                    .select("*")
+                    .eq("client_id", user.id)
+                    .order("created_at", { ascending: false });
+
+                if (!projectsError && projectsData) {
+                    setMyProjects(projectsData);
+                }
+
+                // 3. Fetch applications submitted by the user (with joined project details)
+                const { data: appsData, error: appsError } = await supabase
+                    .from("applications")
+                    .select(`
+                        *,
+                        project:projects (
+                            title,
+                            status,
+                            budget
+                        )
+                    `)
+                    .eq("applicant_id", user.id)
+                    .order("created_at", { ascending: false });
+
+                if (!appsError && appsData) {
+                    setMyApplications(appsData);
+                }
+
             } catch (err) {
-                console.error("Error fetching profile:", err);
+                console.error("Error fetching dashboard data:", err);
             } finally {
                 setProfileLoading(false);
+                setCollabsLoading(false);
             }
         };
 
-        fetchProfile();
+        fetchData();
     }, [user]);
 
     if (!isLoaded || profileLoading) {
@@ -56,7 +93,7 @@ export default function DashboardPage() {
 
     // Render Full Dashboard once profile exists
     return (
-        <div className="min-h-screen flex flex-col bg-[#07070a] text-gray-100 font-sans relative overflow-hidden">
+        <div className="min-h-screen flex flex-col bg-transparent text-gray-100 font-sans relative overflow-hidden">
 
             {/* Ambient Background Glows */}
             <div className="absolute top-[-20%] left-[-10%] h-[600px] w-[600px] rounded-full bg-indigo-500/5 blur-[120px] pointer-events-none" />
@@ -108,19 +145,88 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
                     {/* Left & Middle Column: Projects Panel */}
-                    <div className="lg:col-span-2 rounded-2xl border border-gray-900 bg-gray-950/10 p-6 backdrop-blur-sm hover:border-gray-800/80 transition-all flex flex-col justify-between">
+                    <div className="lg:col-span-2 glass-card rounded-2xl p-6 flex flex-col justify-between">
                         <div>
                             <div className="mb-6 flex items-center gap-2 border-b border-gray-900 pb-4">
                                 <Briefcase className="h-5 w-5 text-indigo-400" />
                                 <h2 className="text-lg font-bold text-gray-200">Active Collaborations</h2>
                             </div>
-                            <div className="flex flex-col items-center justify-center py-12 text-center">
-                                <div className="h-12 w-12 rounded-xl bg-gray-900/40 border border-gray-800 flex items-center justify-center text-gray-400 mb-4 shadow-inner">
-                                    <Briefcase className="h-5 w-5" />
+                            {collabsLoading ? (
+                                <div className="flex justify-center items-center py-12">
+                                    <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent"></div>
                                 </div>
-                                <p className="text-sm font-semibold text-gray-300">No active projects yet</p>
-                                <p className="text-xs text-gray-500 max-w-xs mt-1">Ready to start? Discover active requests from fellow students or construct a new proposal.</p>
-                            </div>
+                            ) : myProjects.length > 0 || myApplications.length > 0 ? (
+                                <div className="space-y-6 max-h-[380px] overflow-y-auto pr-2 custom-scrollbar">
+                                    {/* Projects posted by user */}
+                                    {myProjects.length > 0 && (
+                                        <div className="space-y-3">
+                                            <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Your Posted Projects</h3>
+                                            {myProjects.map((proj) => (
+                                                <div key={proj.id} className="flex items-center justify-between p-3.5 rounded-xl border border-gray-900 bg-gray-950/20 backdrop-blur-sm hover:border-gray-800 transition-all">
+                                                    <div>
+                                                        <h4 className="text-sm font-bold text-gray-200">{proj.title}</h4>
+                                                        <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                                                            <span className="text-emerald-400 font-medium">{proj.budget || "Portfolio Work"}</span>
+                                                            <span>•</span>
+                                                            <span className={proj.status === 'open' ? 'text-indigo-400 capitalize' : 'text-purple-400 capitalize'}>{proj.status}</span>
+                                                        </div>
+                                                    </div>
+                                                    <Link
+                                                        href={`/manage/${proj.id}`}
+                                                        className="text-xs font-semibold text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/40 bg-indigo-500/5 hover:bg-indigo-500/10 rounded-lg px-3 py-1.5 transition-all"
+                                                    >
+                                                        Manage
+                                                    </Link>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* Applications submitted by user */}
+                                    {myApplications.length > 0 && (
+                                        <div className="space-y-3 pt-2">
+                                            <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Your Submitted Proposals</h3>
+                                            {myApplications.map((app) => (
+                                                <div key={app.id} className="flex items-center justify-between p-3.5 rounded-xl border border-gray-900 bg-gray-950/20 backdrop-blur-sm hover:border-gray-800 transition-all">
+                                                    <div>
+                                                        <h4 className="text-sm font-bold text-gray-200">{app.project?.title || "Unknown Project"}</h4>
+                                                        <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                                                            <span className="text-emerald-400 font-medium">{app.project?.budget || "Portfolio Work"}</span>
+                                                            <span>•</span>
+                                                            <span>Applied {new Date(app.created_at).toLocaleDateString()}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        {app.status === "accepted" && (
+                                                            <span className="inline-flex items-center rounded-lg bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold text-emerald-400 border border-emerald-500/25">
+                                                                Accepted
+                                                            </span>
+                                                        )}
+                                                        {app.status === "rejected" && (
+                                                            <span className="inline-flex items-center rounded-lg bg-gray-900/80 px-2.5 py-1 text-[10px] font-bold text-gray-500 border border-gray-800">
+                                                                Closed
+                                                            </span>
+                                                        )}
+                                                        {app.status === "pending" && (
+                                                            <span className="inline-flex items-center rounded-lg bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold text-amber-400 border border-amber-500/25">
+                                                                Pending
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center py-12 text-center">
+                                    <div className="h-12 w-12 rounded-xl bg-gray-900/40 border border-gray-800 flex items-center justify-center text-gray-400 mb-4 shadow-inner">
+                                        <Briefcase className="h-5 w-5" />
+                                    </div>
+                                    <p className="text-sm font-semibold text-gray-300">No active projects yet</p>
+                                    <p className="text-xs text-gray-500 max-w-xs mt-1">Ready to start? Discover active requests from fellow students or construct a new proposal.</p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Action Buttons */}
@@ -141,7 +247,7 @@ export default function DashboardPage() {
                     </div>
 
                     {/* Right Column: User Profile Panel */}
-                    <div className="rounded-2xl border border-gray-900 bg-gray-950/10 p-6 backdrop-blur-sm hover:border-gray-800/80 transition-all flex flex-col justify-between">
+                    <div className="glass-card rounded-2xl p-6 flex flex-col justify-between">
                         <div>
                             <div className="mb-6 flex items-center gap-2 border-b border-gray-900 pb-4">
                                 <UserIcon className="h-5 w-5 text-purple-400" />

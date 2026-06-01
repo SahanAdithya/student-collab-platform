@@ -42,7 +42,7 @@ export default async function ProjectsCatalog({
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-[#07070a] text-gray-100 font-sans relative overflow-hidden">
+        <div className="min-h-screen flex flex-col bg-transparent text-gray-100 font-sans relative overflow-hidden">
 
             {/* Ambient Background Glows */}
             <div className="absolute top-[-20%] left-[20%] h-[500px] w-[500px] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none" />
@@ -81,7 +81,7 @@ export default async function ProjectsCatalog({
                 {projects && projects.length > 0 ? (
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {projects.map((project) => (
-                            <div key={project.id} className="group flex flex-col justify-between rounded-2xl border border-gray-900 bg-gray-950/20 p-6 backdrop-blur-sm transition-all hover:border-indigo-500/50 hover:bg-gray-950/40 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-indigo-500/10">
+                            <div key={project.id} className="group flex flex-col justify-between glass-card rounded-2xl p-6">
                                 <div>
                                     <div className="mb-4 flex items-center justify-between">
                                         <span className="inline-flex items-center rounded-full bg-indigo-500/10 px-2.5 py-0.5 text-xs font-medium text-indigo-400 border border-indigo-500/20">
