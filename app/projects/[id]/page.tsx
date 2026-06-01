@@ -2,7 +2,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { Briefcase, Clock, DollarSign, ArrowLeft, Send, Mail } from "lucide-react";
+import { Briefcase, Clock, DollarSign, ArrowLeft, Send, Mail, MessageSquare, FileText } from "lucide-react";
 import Link from "next/link";
 import { sendEmail } from "../../../utils/mail";
 
@@ -38,6 +38,19 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
             </div>
         );
     }
+
+    // Fetch if current user has an accepted application for this project
+    const { data: acceptedApp } = await supabase
+        .from("applications")
+        .select("*")
+        .eq("project_id", id)
+        .eq("applicant_id", userId)
+        .eq("status", "accepted")
+        .limit(1);
+
+    const isAcceptedCollaborator = !!(acceptedApp && acceptedApp.length > 0);
+    const isOwner = project.client_id === userId;
+    const canJoinChat = isOwner || isAcceptedCollaborator;
 
     // Server Action to handle applying
     async function submitApplication(formData: FormData) {
@@ -179,6 +192,16 @@ The CollabHub Team`;
                                 {project.contact_email}
                             </a>
                         )}
+
+                        {canJoinChat && (
+                            <Link
+                                href={`/projects/${project.id}/chat`}
+                                className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 font-semibold bg-purple-500/5 border border-purple-500/10 hover:border-purple-500/30 rounded-xl px-4 py-2.5 backdrop-blur-sm text-sm transition-all"
+                            >
+                                <MessageSquare className="h-4.5 w-4.5" />
+                                Open Workspace Chat
+                            </Link>
+                        )}
                     </div>
                 </div>
 
@@ -192,6 +215,29 @@ The CollabHub Team`;
                         {project.description}
                     </div>
                 </div>
+
+                {/* Project Specifications Card (if exists) */}
+                {project.specification_url && (
+                    <div className="glass-card rounded-2xl p-8 mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/10 shadow-inner">
+                                <FileText className="h-6 w-6" />
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-bold text-gray-200">Project Specifications</h3>
+                                <p className="text-xs text-gray-500 mt-0.5">Technical requirements, scopes, and reference diagrams.</p>
+                            </div>
+                        </div>
+                        <a
+                            href={project.specification_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full sm:w-auto text-center rounded-xl bg-indigo-500/5 hover:bg-indigo-500/10 border border-indigo-500/20 hover:border-indigo-500/40 px-5 py-3 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-all cursor-pointer"
+                        >
+                            View PDF Specifications
+                        </a>
+                    </div>
+                )}
 
                 {/* Application Submission Form */}
                 <div className="glass-card rounded-2xl p-8">
