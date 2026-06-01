@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { CheckCircle, XCircle, ArrowLeft, FileText, User as UserIcon, Trash2, Mail } from "lucide-react";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
+import { sendEmail } from "../../../utils/mail";
 
 // Initialize Supabase client for server-side operations (uses service role key if available to bypass RLS)
 const supabase = createClient(
@@ -46,6 +47,12 @@ export default async function ManageProjectPage({ params }: { params: Promise<{ 
         const applicationId = formData.get("applicationId") as string;
         const projectId = id;
 
+        // Fetch all current applications to get contact emails before updating
+        const { data: allApplications } = await supabase
+            .from("applications")
+            .select("*")
+            .eq("project_id", projectId);
+
         // Mark selected application as accepted
         await supabase.from("applications").update({ status: "accepted" }).eq("id", applicationId);
 
@@ -54,6 +61,61 @@ export default async function ManageProjectPage({ params }: { params: Promise<{ 
 
         // Auto-reject all other pending applications
         await supabase.from("applications").update({ status: "rejected" }).eq("project_id", projectId).eq("status", "pending");
+
+        // Send out status email alerts
+        if (allApplications && allApplications.length > 0) {
+            for (const app of allApplications) {
+                if (app.id === applicationId) {
+                    // Send Acceptance Congratulatory email to selected candidate
+                    if (app.contact_email) {
+                        try {
+                            const subject = `Congratulations! Your proposal for "${project.title}" has been accepted!`;
+                            const text = `Hello!
+
+We are excited to inform you that your proposal to collaborate on the project "${project.title}" has been ACCEPTED by the project owner!
+
+You can now start collaborating together. The project owner will contact you shortly at this email address to coordinate.
+
+Best regards,
+The CollabHub Team`;
+
+                            await sendEmail({
+                                to: app.contact_email,
+                                subject,
+                                text,
+                            });
+                        } catch (err) {
+                            console.error("Failed to send applicant acceptance email:", err);
+                        }
+                    }
+                } else if (app.status === "pending") {
+                    // Send Project Closed notification to rejected candidates
+                    if (app.contact_email) {
+                        try {
+                            const subject = `Update on your proposal for "${project.title}"`;
+                            const text = `Hello,
+
+Thank you for your interest in collaborating on the project "${project.title}".
+
+We wanted to let you know that the project owner has selected another collaborator for this role, and the project is now closed.
+
+We encourage you to explore the other active requests in the Project Catalog! There are always exciting opportunities waiting for your skills.
+
+Best regards,
+The CollabHub Team`;
+
+                            await sendEmail({
+                                to: app.contact_email,
+                                subject,
+                                text,
+                            });
+                        } catch (err) {
+                            console.error("Failed to send applicant rejection email:", err);
+                        }
+                    }
+                }
+            }
+        }
 
         revalidatePath(`/manage/${projectId}`);
     }

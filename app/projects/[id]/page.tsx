@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { Briefcase, Clock, DollarSign, ArrowLeft, Send, Mail } from "lucide-react";
 import Link from "next/link";
+import { sendEmail } from "../../../utils/mail";
 
 // Initialize Supabase client for server-side operations (uses service role key if available to bypass RLS)
 const supabase = createClient(
@@ -62,6 +63,66 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
         if (error) {
             console.error("Application error:", error);
             return;
+        }
+
+        // Auto-send email notification to the client if they have set a contact email
+        if (project && project.contact_email) {
+            try {
+                const subject = `New Application for your project: ${project.title}`;
+                const text = `Hello!
+
+A student has just submitted a proposal to collaborate on your project: "${project.title}".
+
+--------------------------------------------------
+PROPOSAL MESSAGE:
+"${message}"
+--------------------------------------------------
+
+CONTACT THE APPLICANT:
+You can reach the applicant directly by replying to this email, or writing to their contact email:
+👉 ${contact_email}
+
+Best regards,
+The CollabHub Team`;
+
+                await sendEmail({
+                    to: project.contact_email,
+                    subject,
+                    text,
+                });
+            } catch (err) {
+                console.error("Failed to send automatic application email notification:", err);
+            }
+        }
+
+        // Auto-send submission confirmation to the applicant
+        if (contact_email) {
+            try {
+                const subject = `Application Submitted: ${project.title}`;
+                const text = `Hello!
+
+Your proposal to collaborate on the project "${project.title}" has been successfully recorded.
+
+--------------------------------------------------
+YOUR PROPOSAL:
+"${message}"
+--------------------------------------------------
+
+What happens next?
+The project owner will review your application. If it matches their needs, they will contact you directly at your contact email:
+👉 ${contact_email}
+
+Best regards,
+The CollabHub Team`;
+
+                await sendEmail({
+                    to: contact_email,
+                    subject,
+                    text,
+                });
+            } catch (err) {
+                console.error("Failed to send applicant submission confirmation email:", err);
+            }
         }
 
         // Redirect to dashboard on success
