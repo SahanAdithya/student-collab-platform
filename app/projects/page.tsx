@@ -1,8 +1,9 @@
 // app/projects/page.tsx
 import { createClient } from "@supabase/supabase-js";
-import { Briefcase, Clock, DollarSign, ArrowRight, Search, LayoutDashboard } from "lucide-react";
+import { Briefcase, Clock, DollarSign, ArrowRight, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
+import SearchInput from "./SearchInput";
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -13,13 +14,28 @@ const supabase = createClient(
 // We want Next.js to dynamically render this page so new projects appear immediately
 export const dynamic = "force-dynamic";
 
-export default async function ProjectsCatalog() {
-    // Fetch projects from Supabase
-    const { data: projects, error } = await supabase
+export default async function ProjectsCatalog({
+    searchParams,
+}: {
+    searchParams: Promise<{ q?: string }>
+}) {
+    // Await the Next.js 16 search parameters
+    const { q } = await searchParams;
+    const searchQuery = typeof q === "string" ? q.trim() : "";
+
+    // Build the Supabase query builder
+    let dbQuery = supabase
         .from("projects")
         .select("*")
         .eq("status", "open")
         .order("created_at", { ascending: false });
+
+    // Apply filters if search term exists
+    if (searchQuery) {
+        dbQuery = dbQuery.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
+    }
+
+    const { data: projects, error } = await dbQuery;
 
     if (error) {
         console.error("Error fetching projects:", error);
@@ -58,15 +74,7 @@ export default async function ProjectsCatalog() {
                         <h1 className="text-3xl font-extrabold tracking-tight text-white">Project Catalog</h1>
                         <p className="mt-2 text-sm text-gray-400">Discover active collaboration requests and build your portfolio.</p>
                     </div>
-
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-                        <input
-                            type="text"
-                            placeholder="Search projects..."
-                            className="w-full md:w-64 rounded-xl border border-gray-800 bg-gray-950/50 py-2.5 pl-10 pr-4 text-sm text-gray-200 placeholder-gray-500 backdrop-blur-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                        />
-                    </div>
+                    <SearchInput />
                 </div>
 
                 {/* Project Grid */}
