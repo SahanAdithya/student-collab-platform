@@ -39,16 +39,15 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
         );
     }
 
-    // Fetch if current user has an accepted application for this project
-    const { data: acceptedApp } = await supabase
+    // Fetch if current user has any application for this project
+    const { data: userApps } = await supabase
         .from("applications")
         .select("*")
         .eq("project_id", id)
-        .eq("applicant_id", userId)
-        .eq("status", "accepted")
-        .limit(1);
+        .eq("applicant_id", userId);
 
-    const isAcceptedCollaborator = !!(acceptedApp && acceptedApp.length > 0);
+    const hasApplied = !!(userApps && userApps.length > 0);
+    const isAcceptedCollaborator = !!(userApps && userApps.some(app => app.status === "accepted"));
     const isOwner = project.client_id === userId;
     const canJoinChat = isOwner || isAcceptedCollaborator;
 
@@ -228,56 +227,84 @@ The CollabHub Team`;
                                 <p className="text-xs text-gray-500 mt-0.5">Technical requirements, scopes, and reference diagrams.</p>
                             </div>
                         </div>
-                        <a
-                            href={project.specification_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-full sm:w-auto text-center rounded-xl bg-indigo-500/5 hover:bg-indigo-500/10 border border-indigo-500/20 hover:border-indigo-500/40 px-5 py-3 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-all cursor-pointer"
-                        >
-                            View PDF Specifications
-                        </a>
+                        <div className="flex flex-col sm:flex-row gap-2.5 w-full sm:w-auto">
+                            <a
+                                href={project.specification_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full sm:w-auto text-center rounded-xl bg-indigo-500/5 hover:bg-indigo-500/10 border border-indigo-500/20 hover:border-indigo-500/40 px-5 py-3 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-all cursor-pointer"
+                            >
+                                View PDF Online
+                            </a>
+                            <a
+                                href={project.specification_url}
+                                download
+                                className="w-full sm:w-auto text-center rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-800 hover:border-gray-700 px-5 py-3 text-xs font-bold text-gray-300 hover:text-white transition-all cursor-pointer"
+                            >
+                                Download PDF
+                            </a>
+                        </div>
                     </div>
                 )}
 
-                {/* Application Submission Form */}
-                <div className="glass-card rounded-2xl p-8">
-                    <h2 className="text-xl font-bold text-white mb-2">Submit a Proposal</h2>
-                    <p className="text-xs text-gray-400 mb-6">Introduce yourself, detail your skill set, and explain why you are the right fit for this project.</p>
-
-                    <form action={submitApplication} className="space-y-5">
-                        <div>
-                            <label htmlFor="contact_email" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Your Contact Email</label>
-                            <input
-                                type="email"
-                                name="contact_email"
-                                id="contact_email"
-                                required
-                                className="w-full rounded-xl border border-gray-900 bg-gray-900/10 p-4 text-sm text-gray-100 placeholder-gray-600 focus:border-indigo-500/50 focus:ring-0 focus:outline-none transition-all"
-                                placeholder="e.g., yourname@university.edu"
-                            />
+                {/* Application Submission Form or Application Status Callout */}
+                {!isOwner && (
+                    hasApplied ? (
+                        <div className="glass-card rounded-2xl p-8 border border-indigo-500/10">
+                            <h2 className="text-xl font-bold text-white mb-2">Proposal Status</h2>
+                            {isAcceptedCollaborator ? (
+                                <div className="mt-4 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-emerald-400 text-sm font-semibold flex items-center gap-2.5">
+                                    <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                                    Your application has been accepted! You are now an active collaborator.
+                                </div>
+                            ) : (
+                                <div className="mt-4 p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 text-amber-400 text-sm font-semibold flex items-center gap-2.5">
+                                    <span className="flex h-2.5 w-2.5 rounded-full bg-amber-400 animate-pulse" />
+                                    Your application is currently pending review by the project owner.
+                                </div>
+                            )}
                         </div>
+                    ) : (
+                        <div className="glass-card rounded-2xl p-8">
+                            <h2 className="text-xl font-bold text-white mb-2">Submit a Proposal</h2>
+                            <p className="text-xs text-gray-400 mb-6">Introduce yourself, detail your skill set, and explain why you are the right fit for this project.</p>
 
-                        <div>
-                            <label htmlFor="message" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Proposal Message</label>
-                            <textarea
-                                name="message"
-                                id="message"
-                                required
-                                rows={5}
-                                placeholder="Hi Sahan! I have active experience building e-commerce frontends with React and custom CSS layouts, and would love to collaborate..."
-                                className="w-full rounded-xl border border-gray-900 bg-gray-900/10 p-4 text-sm text-gray-100 placeholder-gray-600 focus:border-indigo-500/50 focus:ring-0 focus:outline-none focus:bg-gray-900/20 transition-all resize-none"
-                            />
+                            <form action={submitApplication} className="space-y-5">
+                                <div>
+                                    <label htmlFor="contact_email" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Your Contact Email</label>
+                                    <input
+                                        type="email"
+                                        name="contact_email"
+                                        id="contact_email"
+                                        required
+                                        className="w-full rounded-xl border border-gray-900 bg-gray-900/10 p-4 text-sm text-gray-100 placeholder-gray-600 focus:border-indigo-500/50 focus:ring-0 focus:outline-none transition-all"
+                                        placeholder="e.g., yourname@university.edu"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label htmlFor="message" className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Proposal Message</label>
+                                    <textarea
+                                        name="message"
+                                        id="message"
+                                        required
+                                        rows={5}
+                                        placeholder="Hi Sahan! I have active experience building e-commerce frontends with React and custom CSS layouts, and would love to collaborate..."
+                                        className="w-full rounded-xl border border-gray-900 bg-gray-900/10 p-4 text-sm text-gray-100 placeholder-gray-600 focus:border-indigo-500/50 focus:ring-0 focus:outline-none focus:bg-gray-900/20 transition-all resize-none"
+                                    />
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className="group flex w-full md:w-auto items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 px-8 py-3.5 text-sm font-bold text-white transition-all hover:shadow-[0_4px_15px_rgba(99,102,241,0.3)] cursor-pointer"
+                                >
+                                    <Send className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                                    Send Application
+                                </button>
+                            </form>
                         </div>
-
-                        <button
-                            type="submit"
-                            className="group flex w-full md:w-auto items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 px-8 py-3.5 text-sm font-bold text-white transition-all hover:shadow-[0_4px_15px_rgba(99,102,241,0.3)] cursor-pointer"
-                        >
-                            <Send className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                            Send Application
-                        </button>
-                    </form>
-                </div>
+                    )
+                )}
 
             </main>
         </div>

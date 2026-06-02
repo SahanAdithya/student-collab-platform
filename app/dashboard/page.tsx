@@ -196,21 +196,49 @@ export default function DashboardPage() {
                                                             <span>Applied {new Date(app.created_at).toLocaleDateString()}</span>
                                                         </div>
                                                     </div>
-                                                    <div>
-                                                        {app.status === "accepted" && (
-                                                            <span className="inline-flex items-center rounded-lg bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold text-emerald-400 border border-emerald-500/25">
-                                                                Accepted
-                                                            </span>
-                                                        )}
-                                                        {app.status === "rejected" && (
-                                                            <span className="inline-flex items-center rounded-lg bg-gray-900/80 px-2.5 py-1 text-[10px] font-bold text-gray-500 border border-gray-800">
-                                                                Closed
-                                                            </span>
-                                                        )}
-                                                        {app.status === "pending" && (
-                                                            <span className="inline-flex items-center rounded-lg bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold text-amber-400 border border-amber-500/25">
-                                                                Pending
-                                                            </span>
+                                                    <div className="flex items-center gap-2">
+                                                        {app.status === "accepted" ? (
+                                                            <>
+                                                                <Link
+                                                                    href={`/projects/${app.project_id}`}
+                                                                    className="text-xs font-semibold text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/40 bg-indigo-500/5 hover:bg-indigo-500/10 rounded-lg px-3 py-1.5 transition-all cursor-pointer"
+                                                                >
+                                                                    View Project
+                                                                </Link>
+                                                                <Link
+                                                                    href={`/projects/${app.project_id}/chat`}
+                                                                    className="text-xs font-semibold text-purple-400 border border-purple-500/20 hover:border-purple-500/40 bg-purple-500/5 hover:bg-purple-500/10 rounded-lg px-3 py-1.5 transition-all cursor-pointer"
+                                                                >
+                                                                    Open Chat
+                                                                </Link>
+                                                                <span className="inline-flex items-center rounded-lg bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold text-emerald-400 border border-emerald-500/25">
+                                                                    Accepted
+                                                                </span>
+                                                            </>
+                                                        ) : app.status === "rejected" ? (
+                                                            <>
+                                                                <Link
+                                                                    href={`/projects/${app.project_id}`}
+                                                                    className="text-xs font-semibold text-gray-500 border border-gray-800 hover:border-gray-700 bg-gray-950/20 hover:bg-gray-900/40 rounded-lg px-3 py-1.5 transition-all cursor-pointer"
+                                                                >
+                                                                    View
+                                                                </Link>
+                                                                <span className="inline-flex items-center rounded-lg bg-gray-900/80 px-2.5 py-1 text-[10px] font-bold text-gray-500 border border-gray-800">
+                                                                    Closed
+                                                                </span>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Link
+                                                                    href={`/projects/${app.project_id}`}
+                                                                    className="text-xs font-semibold text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/40 bg-indigo-500/5 hover:bg-indigo-500/10 rounded-lg px-3 py-1.5 transition-all cursor-pointer"
+                                                                >
+                                                                    View
+                                                                </Link>
+                                                                <span className="inline-flex items-center rounded-lg bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold text-amber-400 border border-amber-500/25">
+                                                                    Pending
+                                                                </span>
+                                                            </>
                                                         )}
                                                     </div>
                                                 </div>
