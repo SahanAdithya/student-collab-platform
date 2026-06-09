@@ -21,6 +21,7 @@ export default function OnboardingGuard({ children }: { children: React.ReactNod
         // If it's a public path or the onboarding path itself, do not guard
         const isPublic = PUBLIC_PATHS.some(path => pathname === path || pathname.startsWith(path + "/"));
         if (isPublic) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setLoading(false);
             return;
         }
