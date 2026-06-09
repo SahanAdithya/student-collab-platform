@@ -4,6 +4,7 @@
 import { useUser, UserButton } from "@clerk/nextjs";
 import { LayoutDashboard, Briefcase, User as UserIcon, Calendar, ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { createClient } from "../../utils/supabase/client";
 
@@ -14,12 +15,12 @@ export default function DashboardPage() {
     const { isLoaded, isSignedIn, user } = useUser();
 
     // Profile State
-    const [profile, setProfile] = useState<any>(null);
+    const [profile, setProfile] = useState<Record<string, unknown> | null>(null);
     const [profileLoading, setProfileLoading] = useState(true);
 
     // Collaborations State
-    const [myProjects, setMyProjects] = useState<any[]>([]);
-    const [myApplications, setMyApplications] = useState<any[]>([]);
+    const [myProjects, setMyProjects] = useState<Record<string, unknown>[]>([]);
+    const [myApplications, setMyApplications] = useState<Record<string, unknown>[]>([]);
     const [collabsLoading, setCollabsLoading] = useState(true);
 
     // Fetch user's profile and active collaborations on mount
@@ -283,9 +284,11 @@ export default function DashboardPage() {
                             </div>
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3.5 border-b border-gray-900/50 pb-4">
-                                    <img
+                                    <Image
                                         src={user.imageUrl}
                                         alt="Profile"
+                                        width={48}
+                                        height={48}
                                         className="h-12 w-12 rounded-full border border-gray-800"
                                     />
                                     <div>
