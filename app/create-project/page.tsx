@@ -32,7 +32,7 @@ export default async function CreateProjectPage() {
             try {
                 const fileBuffer = Buffer.from(await file.arrayBuffer());
                 const fileName = `${userId}-${Date.now()}-${file.name.replace(/\s+/g, "_")}`;
-                const { data: uploadData, error: uploadErr } = await supabase.storage
+                const { error: uploadErr } = await supabase.storage
                     .from("specifications")
                     .upload(fileName, fileBuffer, {
                         contentType: file.type,
