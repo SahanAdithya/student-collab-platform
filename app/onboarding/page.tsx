@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { User as UserIcon, Calendar, Info, ShieldAlert } from "lucide-react";
+import { User as UserIcon, Info, ShieldAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { createClient } from "../../utils/supabase/client";
@@ -33,7 +33,7 @@ export default function OnboardingPage() {
 
         const checkExistingProfile = async () => {
             try {
-                const { data, error } = await supabase
+                const { data } = await supabase
                     .from("profiles")
                     .select("*")
                     .eq("id", user.id)
@@ -95,9 +95,9 @@ export default function OnboardingPage() {
 
             // Redirect to dashboard on success
             router.push("/dashboard");
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Form submit error:", err);
-            setErrorMsg(err.message || "An unexpected error occurred. Please try again.");
+            setErrorMsg((err as Error).message || "An unexpected error occurred. Please try again.");
             setSubmitting(false);
         }
     };
