@@ -5,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { createClient } from "../../../../utils/supabase/client";
 import { MessageSquare, ArrowLeft, Send, ShieldAlert, Clock, User as UserIcon } from "lucide-react";
-import Link from "next/link";
 
 const supabase = createClient();
 
@@ -25,7 +24,7 @@ export default function ProjectChatPage() {
     const id = typeof params.id === "string" ? params.id : "";
 
     // Data State
-    const [project, setProject] = useState<any>(null);
+    const [project, setProject] = useState<Record<string, unknown> | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
