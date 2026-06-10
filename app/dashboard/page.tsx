@@ -15,12 +15,17 @@ export default function DashboardPage() {
     const { isLoaded, isSignedIn, user } = useUser();
 
     // Profile State
-    const [profile, setProfile] = useState<Record<string, unknown> | null>(null);
+    const [profile, setProfile] = useState<{
+        first_name?: string;
+        last_name?: string;
+        birthday?: string;
+        gender?: string;
+    } | null>(null);
     const [profileLoading, setProfileLoading] = useState(true);
 
     // Collaborations State
-    const [myProjects, setMyProjects] = useState<Record<string, unknown>[]>([]);
-    const [myApplications, setMyApplications] = useState<Record<string, unknown>[]>([]);
+    const [myProjects, setMyProjects] = useState<any[]>([]);
+    const [myApplications, setMyApplications] = useState<any[]>([]);
     const [collabsLoading, setCollabsLoading] = useState(true);
 
     // Fetch user's profile and active collaborations on mount
