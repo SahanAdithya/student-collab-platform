@@ -18,7 +18,7 @@ export default async function Home() {
           playsInline
           className="absolute inset-0 w-full h-full object-cover z-0 opacity-50 mix-blend-luminosity"
         >
-          <source src="https://assets.mixkit.co/videos/preview/mixkit-software-developer-working-on-code-on-a-computer-screen-1728-large.mp4" type="video/mp4" />
+          <source src="/background.mp4" type="video/mp4" />
         </video>
       </div>
 
