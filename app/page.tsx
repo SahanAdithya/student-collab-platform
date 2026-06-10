@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { currentUser } from "@clerk/nextjs/server";
-import { ArrowRight, Compass, Users, Code, Zap } from "lucide-react";
+import { ArrowRight, Compass, Users, Code } from "lucide-react";
 
 export default async function Home() {
   const user = await currentUser();
@@ -32,12 +32,6 @@ export default async function Home() {
       {/* Landing Content Wrapper */}
       <div className="relative z-10 mx-auto max-w-4xl text-center flex flex-col items-center">
         
-        {/* Dynamic Badge */}
-        <div className="inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/5 px-4 py-1.5 text-xs font-semibold text-indigo-300 shadow-[0_0_15px_rgba(99,102,241,0.07)] backdrop-blur-md mb-8 hover:border-indigo-400/40 transition-colors">
-          <Zap className="h-3.5 w-3.5 fill-indigo-400/20 text-indigo-400" />
-          The Student Connection Engine is Live
-        </div>
-
         {/* Title / Hero */}
         <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 bg-gradient-to-b from-white via-gray-100 to-gray-400 bg-clip-text text-transparent">
           Collab<span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Hub</span>
