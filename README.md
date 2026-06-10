@@ -76,7 +76,10 @@ This project leverages modern web development tools to ensure performance, scala
     </td>
     <td align="center" width="110">
       <a href="https://wso2.com/asgardeo/">
+<<<<<<< HEAD
         <img src="https://avatars.githubusercontent.com/u/47547?s=200&v=4" width="48" height="48" alt="WSO2 Asgardeo" style="border-radius:10px;"/>
+=======
+>>>>>>> 39bc89866fe80a2db7c39e52c14beed062c80712
         <br>WSO2 Asgardeo
       </a>
     </td>
