@@ -2,10 +2,11 @@
 import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { CheckCircle, XCircle, ArrowLeft, FileText, User as UserIcon, Trash2, Mail, MessageSquare } from "lucide-react";
+import { CheckCircle, XCircle, ArrowLeft, FileText, User as UserIcon, Mail, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { sendEmail } from "../../../utils/mail";
+import DeleteProjectSection from "../../../components/DeleteProjectSection";
 
 // Initialize Supabase client for server-side operations (uses service role key if available to bypass RLS)
 const supabase = createClient(
@@ -182,14 +183,11 @@ The CollabHub Team`;
                                 <MessageSquare className="h-4.5 w-4.5" /> Open Workspace Chat
                             </Link>
                         )}
-                        <form action={deleteProject} className="w-full sm:w-auto">
-                            <button
-                                type="submit"
-                                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-red-950/20 text-red-400 border border-red-500/20 hover:bg-red-900/20 hover:border-red-500/40 px-5 py-3 text-sm font-bold transition-all shadow-[0_0_20px_rgba(239,68,68,0.02)] cursor-pointer"
-                            >
-                                <Trash2 className="h-4 w-4" /> Delete Project
-                            </button>
-                        </form>
+                        <DeleteProjectSection
+                            projectTitle={project.title}
+                            status={project.status}
+                            deleteProjectAction={deleteProject}
+                        />
                     </div>
                 </div>
 
